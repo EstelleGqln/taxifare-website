@@ -29,19 +29,42 @@ import requests
 # - passenger count
 # '''
 '''
-## Please input your parameters for your ride:
+### Please input the parameters for your ride:
 '''
-
 d = st.date_input(
     "Which day do you need the pick-up?",
     datetime.date(2019, 7, 6))
 t = st.time_input('What time?', datetime.time(8, 45))
 
-p_lat = st.number_input('Pick-up latitude', value=40.6, min_value = 40.5, max_value = 40.9)
-p_lon = st.number_input('Pick-up longitude', value=40.7, min_value = 40.5, max_value = 40.9)
-d_lat = st.number_input('Drop-off latitude', value=-74.0, min_value = -74.3, max_value = -73.7)
-d_lon  = st.number_input('Drop-off longitude', value=-74.1, min_value = -74.3, max_value = -73.7)
-people  = st.number_input('How many passengers?', 1, step=1)
+# people  = st.number_input('How many passengers?', 1, step=1)
+people = st.slider('How many passengers?', 1, 8, 1)
+
+
+direction = st.radio('What inputs do you have?', ('addres', 'coordinates'))
+
+st.write(direction)
+if direction == 'addres':
+    p_address = st.text_input('Pick-up address', 'Trump Tower')
+    d_address = st.text_input('Drop-off address', 'Empire State Building')
+
+    url_address = 'https://nominatim.openstreetmap.org/search'
+
+    p_response = requests.get(url_address, params={'q': p_address, 'format': 'json'}).json()
+    p_lat = float(p_response[0]['lat'])
+    p_lon = float(p_response[0]['lon'])
+
+    d_response = requests.get(url_address, params={'q': d_address, 'format': 'json'}).json()
+    d_lat = float(d_response[0]['lat'])
+    d_lon = float(d_response[0]['lon'])
+
+elif direction == 'coordinates':
+    p_lat = st.number_input('Pick-up latitude', value=40.762428, min_value = 40.5, max_value = 40.9)
+    p_lon = st.number_input('Pick-up longitude', value=-73.973793, min_value = -74.3, max_value = -73.7)
+    d_lat = st.number_input('Drop-off latitude', value=40.748817, min_value = 40.5, max_value = 40.9)
+    d_lon  = st.number_input('Drop-off longitude', value=-73.985428, min_value = -74.3, max_value = -73.7)
+
+else:
+    st.write('You need to pick an input!')
 
 '''
 Check this map out!
@@ -49,7 +72,7 @@ Check this map out!
 @st.cache
 def get_map_data():
     return pd.DataFrame(
-            np.array([[p_lat, d_lat], [p_lon, d_lon]]),
+            np.array([[p_lat, p_lon], [d_lat, d_lon]]),
             columns=['lat', 'lon']
         )
 df = get_map_data()
@@ -66,19 +89,19 @@ st.map(df)
 
 url = 'https://taxifare.lewagon.ai/predict'
 
-if url == 'https://taxifare.lewagon.ai/predict':
-    st.markdown('Maybe you want to use your own API for the prediction, not the one provided by Le Wagon...')
+# if url == 'https://taxifare.lewagon.ai/predict':
+#     st.markdown('Maybe you want to use your own API for the prediction, not the one provided by Le Wagon...')
 
 
-'''
-2. Let's build a dictionary containing the parameters for our API...
+# '''
+# 2. Let's build a dictionary containing the parameters for our API...
 
-3. Let's call our API using the `requests` package...
+# 3. Let's call our API using the `requests` package...
 
-4. Let's retrieve the prediction from the **JSON** returned by the API...
+# 4. Let's retrieve the prediction from the **JSON** returned by the API...
 
-## Finally, we can display the prediction to the user
-'''
+# ## Finally, we can display the prediction to the user
+# '''
 paramsss = {
     'pickup_datetime': f"{d} {t}",
     'pickup_longitude': p_lon,
@@ -90,5 +113,7 @@ paramsss = {
 
 response = requests.get(url, params=paramsss).json()
 
-
+'''
+### Predicted fare price
+'''
 st.write('Here is the predicted fare price:', response['fare'])
