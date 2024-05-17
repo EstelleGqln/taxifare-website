@@ -40,22 +40,28 @@ t = st.time_input('What time?', datetime.time(8, 45))
 people = st.slider('How many passengers?', 1, 8, 1)
 
 
-direction = st.radio('What inputs do you have?', ('addres', 'coordinates'))
+def get_address(address):
+    url_address = 'https://nominatim.openstreetmap.org/search'
+    response = requests.get(url_address, params={'q': address, 'format': 'json'})
+    if response.status_code != 204:
+        try:
+            resp = response.json()
+            lat = float(resp[0]['lat'])
+            lon = float(resp[0]['lon'])
 
+            return lat, lon
+        except:
+            st.write('Address request did not word. Default values for location used.')
+            return 40.7, -74.0
+
+direction = st.radio('What inputs do you have?', ('addres', 'coordinates'))
 st.write(direction)
 if direction == 'addres':
     p_address = st.text_input('Pick-up address', 'Trump Tower')
     d_address = st.text_input('Drop-off address', 'Empire State Building')
 
-    url_address = 'https://nominatim.openstreetmap.org/search'
-
-    p_response = requests.get(url_address, params={'q': p_address, 'format': 'json'}).json()
-    p_lat = float(p_response[0]['lat'])
-    p_lon = float(p_response[0]['lon'])
-
-    d_response = requests.get(url_address, params={'q': d_address, 'format': 'json'}).json()
-    d_lat = float(d_response[0]['lat'])
-    d_lon = float(d_response[0]['lon'])
+    p_lat, p_lon = get_address(p_address)
+    d_lat, d_lon = get_address(d_address)
 
 elif direction == 'coordinates':
     p_lat = st.number_input('Pick-up latitude', value=40.762428, min_value = 40.5, max_value = 40.9)
