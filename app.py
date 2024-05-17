@@ -66,9 +66,7 @@ elif direction == 'coordinates':
 else:
     st.write('You need to pick an input!')
 
-'''
-Check this map out!
-'''
+
 @st.cache
 def get_map_data():
     return pd.DataFrame(
@@ -76,7 +74,12 @@ def get_map_data():
             columns=['lat', 'lon']
         )
 df = get_map_data()
-st.map(df)
+
+if st.checkbox('Click here to see a map!'):
+    '''
+    Check this map out!
+    '''
+    st.map(df)
 
 
 # '''
@@ -116,4 +119,8 @@ response = requests.get(url, params=paramsss).json()
 '''
 ### Predicted fare price
 '''
-st.write('Here is the predicted fare price:', response['fare'])
+col1, col2, col3 = st.columns(3)
+col1.metric("","")
+col2.metric("",f"${response['fare']}")
+col3.metric("","")
+# st.write('Here is the predicted fare price:', response['fare'])
