@@ -51,7 +51,7 @@ def get_address(address):
 
             return lat, lon
         except:
-            st.write('Address request did not word. Default values for location used.')
+            st.write('Address request did not work. Default values for location used.')
             return 40.7, -74.0
 
 direction = st.radio('What inputs do you have?', ('addres', 'coordinates'))
