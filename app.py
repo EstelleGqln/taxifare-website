@@ -31,10 +31,11 @@ import requests
 '''
 ### Please input the parameters for your ride:
 '''
-d = st.date_input(
+col1, col2 = st.columns(2)
+d = col1.date_input(
     "Which day do you need the pick-up?",
     datetime.date(2019, 7, 6))
-t = st.time_input('What time?', datetime.time(8, 45))
+t = col2.time_input('What time?', datetime.time(8, 45))
 
 # people  = st.number_input('How many passengers?', 1, step=1)
 people = st.slider('How many passengers?', 1, 8, 1)
@@ -64,10 +65,11 @@ if direction == 'addres':
     d_lat, d_lon = get_address(d_address)
 
 elif direction == 'coordinates':
-    p_lat = st.number_input('Pick-up latitude', value=40.762428, min_value = 40.5, max_value = 40.9)
-    p_lon = st.number_input('Pick-up longitude', value=-73.973793, min_value = -74.3, max_value = -73.7)
-    d_lat = st.number_input('Drop-off latitude', value=40.748817, min_value = 40.5, max_value = 40.9)
-    d_lon  = st.number_input('Drop-off longitude', value=-73.985428, min_value = -74.3, max_value = -73.7)
+    col1, col2, col3, col4 = st.columns(4)
+    p_lat = col1.number_input('Pick-up latitude', value=40.762428, min_value = 40.5, max_value = 40.9)
+    p_lon = col2.number_input('Pick-up longitude', value=-73.973793, min_value = -74.3, max_value = -73.7)
+    d_lat = col3.number_input('Drop-off latitude', value=40.748817, min_value = 40.5, max_value = 40.9)
+    d_lon  = col4.number_input('Drop-off longitude', value=-73.985428, min_value = -74.3, max_value = -73.7)
 
 else:
     st.write('You need to pick an input!')
@@ -127,6 +129,6 @@ response = requests.get(url, params=paramsss).json()
 '''
 col1, col2, col3 = st.columns(3)
 col1.metric("","")
-col2.metric("",f"${response['fare']}")
+col2.metric("",f"${round(response['fare'], 2)}")
 col3.metric("","")
 # st.write('Here is the predicted fare price:', response['fare'])
